@@ -1,5 +1,5 @@
 from flask import Flask, render_template, redirect, request
-from flask_login import current_user, login_user, LoginManager
+from flask_login import current_user, login_user, LoginManager, login_required
 from hashlib import sha256
 from werkzeug.security import check_password_hash, generate_password_hash, _hash_funcs
 from flask_mail import Message
@@ -11,6 +11,7 @@ from model.user import User
 
 app = Flask(__name__)
 app.secret_key = 'dev-key'
+address = 'postgresql://%s@localhost/tmi' % 'postgres'
 mail.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -54,12 +55,13 @@ def test():
 @app.route('/adduser', methods=['POST'])
 def add_user():
     json = request.get_json()
-    key = sha256(dumps(json)).hexdigest()
-    user = User(json['username'], json['password'], json['email'], json['key'])
+    key = sha256( str.encode(dumps(json)) ).hexdigest()
+    user = User(json['username'], json['password'], json['email'], key)
     db.session.add(user)
     db.session.commit()
     # msg = Message(key, sender='eliza@ramuh.com', recipients=[json['email']])
     # mail.send(msg)
+    return "Added user"
 
 
 @app.route('/eliza/DOCTOR', methods=['POST'])
@@ -68,4 +70,8 @@ def doctor():
 
 
 if __name__ == '__main__':
+    db.init_app(app)
+    db.app = app
+    db.create_all()
+
     app.run()
