@@ -33,7 +33,7 @@ def login():
     password = json['password']
     user = load_user(username) # queries db for user with 'username'
     if user:
-        if check_password_hash(password, user['password']):
+        if user.check_passwd(password):
             login_user(user)
             # TODO YOU MUST NOW: 
             # delete any old cookies associated with this user in the db
@@ -45,25 +45,21 @@ def login():
 @app.route('/test')
 @login_required
 def test():
-    if current_user.is_authenticated():
         # TODO execute db call to fetch the most recent conversation and render that
         return "you are a logged in user"
 
-@app.route('/logout',)
+@app.route('/logout')
 
 
 @app.route('/adduser', methods=['POST'])
 def add_user():
     json = request.get_json()
     key = sha256(dumps(json)).hexdigest()
-    db.put('users', json['username'], {
-        'password': generate_password_hash(json['password']),
-        'email': json['email'],
-        'activated': False,
-        'key': key
-    })
-    msg = Message(key, sender='eliza@ramuh.com', recipients=[json['email']])
-    mail.send(msg)
+    user = User(json['username'], json['password'], json['email'], json['key'])
+    db.session.add(user)
+    db.session.commit()
+    # msg = Message(key, sender='eliza@ramuh.com', recipients=[json['email']])
+    # mail.send(msg)
 
 
 @app.route('/eliza/DOCTOR', methods=['POST'])

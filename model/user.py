@@ -3,6 +3,7 @@ from database import db
 from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(db.Model, UserMixin):
+    __tablename__ = 'euser'
     username = db.Column(db.String(14), primary_key=True)
     password = db.Column(db.String(256))
     email = db.Column(db.String(50),unique=True)
