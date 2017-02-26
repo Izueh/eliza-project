@@ -10,3 +10,13 @@ if __name__ == '__main__':
     attributes password, email, activated, key
     tolerate 2 failures
     ''')
+    admin.add_space('''
+    space user_session
+    key cookie
+    attributes user_id
+    ''')
+    admin.add_space('''
+    space conversations
+    key convo_num
+    attributes messages
+    ''')

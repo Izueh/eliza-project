@@ -27,6 +27,19 @@ def load_user(user_id):
 
 @app.route('/login', methods=['POST'])
 def login():
+    json = request.get_json()
+    user = json['username']
+    password = json['password']
+    try_auth = db.get('users', user)
+    if try_auth:
+        if check_password_hash(password, try_auth['password']):
+            login_user(try_auth)
+    else: 
+        return "Invalid user"
+
+#Temporary test
+@app.route('/test')
+def test():
     pass
 
 @app.route('/logout',)
