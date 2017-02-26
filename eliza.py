@@ -29,10 +29,7 @@ def load_user(user_id):
 def login():
     pass
 
-
-@app.route('/eliza/DOCTOR', methods=['POST'])
-def doctor():
-    pass
+@app.route('/logout',)
 
 
 @app.route('/adduser', methods=['POST'])
@@ -47,6 +44,11 @@ def add_user():
     })
     msg = Message(key, sender='eliza@ramuh.com', recipients=[json['email']])
     mail.send(msg)
+
+
+@app.route('/eliza/DOCTOR', methods=['POST'])
+def doctor():
+    pass
 
 
 if __name__ == '__main__':
