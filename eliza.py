@@ -7,6 +7,7 @@ from mail import mail
 from database import db
 from json import dumps
 from os import environ
+from model.user import User
 
 app = Flask(__name__)
 app.secret_key = 'dev-key'
@@ -22,7 +23,7 @@ def index():
 
 @login_manager.user_loader
 def load_user(user_id):
-    pass
+    return s
 
 
 @app.route('/login', methods=['POST'])
@@ -30,17 +31,23 @@ def login():
     json = request.get_json()
     user = json['username']
     password = json['password']
-    try_auth = db.get('users', user)
+    try_auth = User.get(username) # queries db for user with 'username'
     if try_auth:
         if check_password_hash(password, try_auth['password']):
             login_user(try_auth)
+            # TODO YOU MUST NOW: 
+            # delete any old cookies associated with this user in the db
+            # since it's a new login, you now render a new session conversation
     else: 
         return "Invalid user"
 
 #Temporary test
 @app.route('/test')
+@login_required
 def test():
-    pass
+    if current_user.is_authenticated():
+        # TODO execute db call to fetch the most recent conversation and render that
+        return "you are a logged in user"
 
 @app.route('/logout',)
 
