@@ -23,18 +23,18 @@ def index():
 
 @login_manager.user_loader
 def load_user(user_id):
-    return s
+    return User.query.filter_by(username=userid).first() # username can be any object property
 
 
 @app.route('/login', methods=['POST'])
 def login():
     json = request.get_json()
-    user = json['username']
+    username = json['username']
     password = json['password']
-    try_auth = User.get(username) # queries db for user with 'username'
-    if try_auth:
-        if check_password_hash(password, try_auth['password']):
-            login_user(try_auth)
+    user = load_user(username) # queries db for user with 'username'
+    if user:
+        if check_password_hash(password, user['password']):
+            login_user(user)
             # TODO YOU MUST NOW: 
             # delete any old cookies associated with this user in the db
             # since it's a new login, you now render a new session conversation
