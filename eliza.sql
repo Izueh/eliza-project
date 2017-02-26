@@ -1,6 +1,12 @@
+DROP TABLE IF EXISTS uSession;
+DROP TABLE IF EXISTS eUser;
+DROP TABLE IF EXISTS message;
+DROP TABLE IF EXISTS conversation;
+
+
 CREATE TABLE eUser(
 username VARCHAR(14),
-password VARCHAR(256)
+password VARCHAR(256),
 email VARCHAR(50),
 validated BOOLEAN,
 key VARCHAR(256),
