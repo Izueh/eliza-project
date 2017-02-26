@@ -11,7 +11,9 @@ from model.user import User
 
 app = Flask(__name__)
 app.secret_key = 'dev-key'
-address = 'postgresql://%s@localhost/tmi' % 'postgres'
+address = 'postgresql://%s:%s@localhost:5432/eliza' % ('postgres', 'cse356')
+app.config['SQLALCHEMY_DATABASE_URI'] = address
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 mail.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
