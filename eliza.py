@@ -1,12 +1,9 @@
 from flask import Flask, render_template, redirect, request
 from flask_login import current_user, login_user, LoginManager, login_required
 from hashlib import sha256
-from werkzeug.security import check_password_hash, generate_password_hash, _hash_funcs
-from flask_mail import Message
-from mail import mail
 from database import db
 from json import dumps
-from os import environ
+from register import RegisterForm
 from model.user import User
 
 app = Flask(__name__)
@@ -14,7 +11,6 @@ app.secret_key = 'dev-key'
 address = 'postgresql://%s:%s@localhost:5432/eliza' % ('postgres', 'cse356')
 app.config['SQLALCHEMY_DATABASE_URI'] = address
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-mail.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -26,11 +22,14 @@ def index():
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.filter_by(username=userid).first() # username can be any object property
+    return User.query.filter_by(username=user_id).first() # username can be any object property
 
 
 @app.route('/login', methods=['POST'])
 def login():
+    form = RegisterForm()
+    if request.method == "GET":
+        return render_template('login.html', form=form)
     json = request.get_json()
     username = json['username']
     password = json['password']
