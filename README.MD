@@ -1,5 +1,5 @@
 # Eliza
-ChatBox API using flask and hyperdex
+A REST based web-app based on the the original ELIZA chatbot
 
 ## Run:
 ```
