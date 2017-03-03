@@ -3,7 +3,6 @@ from flask_login import current_user, login_user, LoginManager, login_required
 from hashlib import sha256
 from database import db
 from json import dumps
-from register import RegisterForm
 from model.user import User
 
 app = Flask(__name__)
