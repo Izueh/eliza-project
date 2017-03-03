@@ -21,9 +21,6 @@ def reply(human):
 	iam_reply = "Why are you " 
 	iam_regex = re.compile('i am (\w+)', re.I)
 
-	
-
-
 	if hello_regex.search(human):
 		reply = hello_reply	
 	elif whatup_regex.search(human):
@@ -33,6 +30,6 @@ def reply(human):
 	elif feelingBad_regex.search(human):
 		reply = feelingBad_reply
 	elif iam_regex.search(human):
-		reply = iam_reply + re.group(1)
+		reply = iam_reply + iam_regex.search(human).group(1) + "? Are you taking your medication?"
 
 	return reply
