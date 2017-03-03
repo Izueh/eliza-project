@@ -16,10 +16,12 @@ def reply(human):
 	feelingGood_regex = re.compile('(fine)|(good)|(well)|(splendid)|(great)|(never better)|(happy)|(jolly)|(fun)|(ok)|(perfect)', re.I)
 
 	feelingBad_reply = "Oh dear. Are you taking your medication?"
-	feelingBad_regex = re.compile('(bad)|(not good)|(not well)|(terrible)|(awful)|(sad)|(could be better)|(angry)|(unhappy)|(depressed)', re.I)
+	feelingBad_regex = re.compile('(bad)|(not good)|(not well)|(terrible)|(awful)|(sad)|(lonely)|(could be better)|(angry)|(unhappy)|(depressed)', re.I)
 
 	iam_reply = "Why are you " 
 	iam_regex = re.compile('i am (\w+)', re.I)
+
+	
 
 
 	if hello_regex.search(human):
