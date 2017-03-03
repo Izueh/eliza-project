@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<form id="register-form" method="POST" action="/register">
+    <input id="username" name="username" type="text">
+    <input id="password" name="password" type="password">
+    <input id="email" name="email" type="email">
+    <input type="submit">
+</form>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"
+        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+        crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='js/register.js') }}"></script>
+
+{% endblock %}
