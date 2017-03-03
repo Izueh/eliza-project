@@ -11,18 +11,18 @@ db = client['eliza']
 
 @app.route('/')
 def index():
-    pass
+    return render_template('home.html')
 
 
-@app.route('/login', methods=['GET','POST'])
+@app.route('/login/', methods=['GET','POST'])
 def login():
     if request.method == 'GET':
-        pass
+        return render_template('login.html') 
     if request.method == 'POST':
         json = request.get_json()
         user = db.user.find_one({'username':json['username']})
         if check_password_hash(user['password'], json['password']):
-            session['user'] = user
+            session['user'] = user['username']
             return 'login success'
 
 @app.route('/logout')
@@ -41,6 +41,9 @@ def add_user():
     db.user.insert_one(json)
     return 'success\n'
 
+@app.route('/register')
+def register():
+    return render_template('register.html')
 
 
 @app.route('/eliza/DOCTOR', methods=['POST'])
