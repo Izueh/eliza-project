@@ -2,9 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ title }}</title>
 </head>
 <body>
-
+    <nav>
+        <a class="nav-link">Home</a>
+        {% if user.logged_in == False %}
+            <a class="nav-link">Login</a>
+        {% else %}
+            <a class="nav-link">Logout</a>
+        {% endif %}
+    </nav>
+    <div>
+        {% block body %}
+            <p>This is the layout!</p>
+        {% endblock %}
+    </div>
 </body>
 </html>
