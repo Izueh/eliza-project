@@ -14,7 +14,7 @@ db = client['eliza']
 
 @app.route('/')
 def index():
-    return render_template('home.html')
+    return render_template('home.html', session=session)
 
 
 @app.route('/login/', methods=['GET','POST'])
@@ -28,6 +28,8 @@ def login():
             session['user'] = user['username']
             db.conversation.insert_one({'username':json['username'], 'start_date': datetime.now(), 'messages': [] })
             return 'login success'
+        else:
+            return 'login failure'
 
 
 @app.route('/logout')

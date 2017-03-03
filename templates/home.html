@@ -1,4 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
     <p>This is the home page</p>
+    {% if session.user %}
+        Hello there {{ session.user }}
+    {% endif %}
 {% endblock %}
