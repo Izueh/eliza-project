@@ -3,7 +3,7 @@ from hashlib import sha256
 from json import dumps
 from bson import json_util
 from werkzeug.security import check_password_hash, generate_password_hash
-from pymongo import MongoClient, DESCENDING
+from pymongo import MongoClient, DESCENDING, ASCENDING
 from doctor import reply
 from datetime import datetime
 
@@ -15,7 +15,11 @@ db = client['eliza']
 
 @app.route('/')
 def index():
-    return render_template('home.html', session=session)
+    if 'user' in session:
+        conversation = db.conversation.find({'username': session['user']}).sort('start_date', DESCENDING).limit(1)[0]
+        return render_template('home.html', session=session, convo=conversation)
+    else:
+        return render_template('home.html')
 
 
 @app.route('/login/', methods=['GET','POST'])
@@ -27,7 +31,7 @@ def login():
         user = db.user.find_one({'username':json['username']})
         if check_password_hash(user['password'], json['password']):
             session['user'] = user['username']
-            db.conversation.insert_one({'username':json['username'], 'start_date': datetime.now(), 'messages': [] })
+            db.conversation.insert_one({'username':json['username'], 'start_date': datetime.utcnow(), 'messages': [] })
             success = {'status' : 'OK'}
             return jsonify(success)
         else:
@@ -39,7 +43,7 @@ def login():
 def logout():
     if 'user' in session:
         session.pop('user',None)
-        success = {'status', 'OK'}
+        success = {'status': 'OK'}
         return jsonify(success)
     else:
         error = {'status' : 'ERROR'}
@@ -81,13 +85,25 @@ def register():
 
 @app.route('/DOCTOR', methods=['POST'])
 def doctor():
-    json = request.get_json()
-    conversation = db.conversation.find({'username': session['username']}).sort('date', DESCENDING).limit(1)[0]
-    conversation['message'].append(json)
-    eliza = reply(json['message'])
-    conversation['message'].append({'name':'eliza', 'message': eliza})
-    db.conversation.replaceOne({'_id': conversation['_id']}, conversation)
-    return dumps({'name':'eliza','message':reply})
+    if 'user' not in session:
+        error = {'status': 'ERROR'}
+        return jsonify(error)
+    else:
+        json = request.get_json()
+
+        # create a message document each for the posted user message and eliza reply
+        human_msg = { 'timestamp': datetime.utcnow(), 'name': session['user'], 'text': json['human'] } # I'm assuming that we get the message like our project : {"human" : "Blah"}
+        eliza = reply(json['human'])
+        eliza_msg = { 'timestamp': datetime.utcnow(), 'name': 'eliza', 'text': eliza }
+        
+        # get the most recent conversation and update it's message array
+        conversation = db.conversation.find({'username': session['user']}).sort('start_date', DESCENDING).limit(1)[0]
+        conversation['messages'].append(human_msg)
+        conversation['messages'].append(eliza_msg)
+        db.conversation.replace_one({'_id': conversation['_id']}, conversation)
+
+        # return the eliza reply
+        return jsonify({'eliza': eliza})
 
 
 @app.route('/listconv', methods=['POST'])
@@ -115,7 +131,7 @@ def get_conv():
         json = request.get_json()
         convo = db.conversation.find_one({'_id': json['id']})
         if convo:
-            response = {'status' : 'OK', 'conversation' : 'dummy value'}
+            response = {'status' : 'OK', 'conversation' : convo.messages}
             return jsonify(response)
         else:
             error = {'status' : 'ERROR'}

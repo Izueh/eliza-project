@@ -1,7 +1,28 @@
 {% extends "layout.html" %}
 {% block body %}
     <p>This is the home page</p>
-    {% if session.user %}
-        Hello there {{ session.user }}
+    {% if session %}
+        <p>Hello there {{ session.user }}</p>
+        <br>
+        <form id="eliza-form">
+            <input id="eliza-prompt" type="text">
+            <input type="submit">Submit</input>
+        </form>
+        <br>
+        <div id="chat-area">
+            {% for m in convo.messages %}
+                {% if m.name == session.user %}
+                    <p>You: {{m.text}}</p>
+                {% else %}
+                    <p>Eliza: {{m.text}}</p>
+                {% endif %}
+            {% endfor %}
+        <div>
+        
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js"
+               integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+               crossorigin="anonymous">
+        </script>
+        <script src="{{ url_for('static', filename='js/eliza.js') }}"></script>
     {% endif %}
 {% endblock %}
