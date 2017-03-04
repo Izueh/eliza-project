@@ -27,15 +27,22 @@ def login():
         if check_password_hash(user['password'], json['password']):
             session['user'] = user['username']
             db.conversation.insert_one({'username':json['username'], 'start_date': datetime.now(), 'messages': [] })
-            return 'login success'
+            success = {'status' : 'OK'}
+            return jsonify(success)
         else:
-            error = {'error' : 'Invalid user'}
+            error = {'status' : 'ERROR', 'error' : 'Invalid user'}
             return jsonify(error)
 
 
 @app.route('/logout')
 def logout():
-    session.pop('username',None)
+    if session['username']:
+        session.pop('username',None)
+        success = {'status', 'OK'}
+        return jsonify(success)
+    else:
+        error = {'status' : 'ERROR'}
+        return jsonify(error)
 
 
 @app.route('/adduser', methods=['POST'])
