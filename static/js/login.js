@@ -8,7 +8,16 @@ $(document).ready(function(){
             method: 'POST',
             url: '/login/',
             contentType: 'application/json',
-            data: JSON.stringify({ "username":username, "password": password})
+            data: JSON.stringify({ "username":username, "password": password}),
+            success : function(data){
+                if(data.error){
+                    // display the error message in the login-error div
+                    $('#login-error').text(data.error);
+                }else{
+                    // redirect to home page
+                    window.location.href = '/';
+                }
+            }
         });
     });
 });

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, session
+from flask import Flask, render_template, redirect, request, session, jsonify
 from hashlib import sha256
 from json import dumps
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -29,7 +29,8 @@ def login():
             db.conversation.insert_one({'username':json['username'], 'start_date': datetime.now(), 'messages': [] })
             return 'login success'
         else:
-            return 'login failure'
+            error = {'error' : 'Invalid user'}
+            return jsonify(error)
 
 
 @app.route('/logout')
