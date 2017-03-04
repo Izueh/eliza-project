@@ -37,7 +37,7 @@ def login():
 
 @app.route('/logout')
 def logout():
-    if session['user']:
+    if 'user' in session:
         session.pop('user',None)
         success = {'status', 'OK'}
         return jsonify(success)
@@ -92,15 +92,34 @@ def doctor():
 
 @app.route('/listconv', methods=['POST'])
 def listconv():
-    if not session['user']:
+    if 'user' not in  session:
         error = {'status' : 'ERROR'}
         return jsonify(error)
     else:
         conversations = db.conversation.find({'username':session['user']})
         convs = [{'id':x['_id'],'start_date':x['start_date']} for x in conversations]
-        response = {'status':'OK', 'conversations': convs}
-        # this must be used since we are dealing with an ObjectID from Mongo
-        return json_util.dumps(response) 
+        if convs:
+            response = {'status':'OK', 'conversations': convs}
+            # this must be used since we are dealing with an ObjectID from Mongo
+            return json_util.dumps(response) 
+        else:
+            error = {'status' : 'ERROR'}
+            return jsonify(error)
+
+@app.route('/getconv', methods=['POST'])
+def get_conv():
+    if 'user' not in session:
+        error = {'status' : 'ERROR'}
+        return jsonify(error)
+    else:
+        json = request.get_json()
+        convo = db.conversation.find_one({'_id': json['id']})
+        if convo:
+            response = {'status' : 'OK', 'conversation' : 'dummy value'}
+            return jsonify(response)
+        else:
+            error = {'status' : 'ERROR'}
+            return jsonify(error)
 
 if __name__ == '__main__':
     app.run()
