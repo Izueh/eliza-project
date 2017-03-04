@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, request, session, jsonify
 from hashlib import sha256
 from json import dumps
+from bson import json_util
 from werkzeug.security import check_password_hash, generate_password_hash
 from pymongo import MongoClient, DESCENDING
 from doctor import reply
@@ -36,8 +37,8 @@ def login():
 
 @app.route('/logout')
 def logout():
-    if session['username']:
-        session.pop('username',None)
+    if session['user']:
+        session.pop('user',None)
         success = {'status', 'OK'}
         return jsonify(success)
     else:
@@ -91,10 +92,15 @@ def doctor():
 
 @app.route('/listconv', methods=['POST'])
 def listconv():
-    conversations = db.conversation.find({'username':session['username']})
-    convs = [{'id':x['id'],'start_date':x['start_date']} for x in conversations]
-    response = {'status':'OK', 'conversations': convs}
-    return dumps(response)
+    if not session['user']:
+        error = {'status' : 'ERROR'}
+        return jsonify(error)
+    else:
+        conversations = db.conversation.find({'username':session['user']})
+        convs = [{'id':x['_id'],'start_date':x['start_date']} for x in conversations]
+        response = {'status':'OK', 'conversations': convs}
+        # this must be used since we are dealing with an ObjectID from Mongo
+        return json_util.dumps(response) 
 
 if __name__ == '__main__':
     app.run()
