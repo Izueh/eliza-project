@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, request, session, jsonify
 from hashlib import sha256
 from json import dumps
-from bson import json_util
+from bson import json_util, ObjectId
 from werkzeug.security import check_password_hash, generate_password_hash
 from pymongo import MongoClient, DESCENDING, ASCENDING
 from doctor import reply
@@ -113,11 +113,10 @@ def listconv():
         return jsonify(error)
     else:
         conversations = db.conversation.find({'username':session['user']})
-        convs = [{'id':x['_id'],'start_date':x['start_date']} for x in conversations]
+        convs = [{'id':str(x['_id']),'start_date':x['start_date']} for x in conversations]
         if convs:
             response = {'status':'OK', 'conversations': convs}
-            # this must be used since we are dealing with an ObjectID from Mongo
-            return json_util.dumps(response) 
+            return jsonify(response) 
         else:
             error = {'status' : 'ERROR'}
             return jsonify(error)
@@ -129,9 +128,9 @@ def get_conv():
         return jsonify(error)
     else:
         json = request.get_json()
-        convo = db.conversation.find_one({'_id': json['id']})
+        convo = db.conversation.find_one({'_id': ObjectId(json['id'])})
         if convo:
-            response = {'status' : 'OK', 'conversation' : convo.messages}
+            response = {'status' : 'OK', 'conversation' : convo['messages']}
             return jsonify(response)
         else:
             error = {'status' : 'ERROR'}
